@@ -416,15 +416,18 @@ namespace Xero.NetStandard.OAuth2.Client
             var existingDeserializer = req.JsonSerializer as IDeserializer;
             if (existingDeserializer != null)
             {
-                client.AddHandler(existingDeserializer, "application/json", "text/json", "text/x-json", "text/javascript", "*+json", "*");
+                foreach(var contentType in new string[] { "application/json", "text/json", "text/x-json", "text/javascript", "*+json", "*" })
+                    client.AddHandler(contentType, () => { return existingDeserializer; });
             }
             else
             {
                 var codec = new CustomJsonCodec(configuration);
-                client.AddHandler(codec, "application/json", "text/json", "text/x-json", "text/javascript", "*+json", "*");
+                foreach(var contentType in new string[] { "application/json", "text/json", "text/x-json", "text/javascript", "*+json", "*" })
+                    client.AddHandler(contentType, () => { return codec; });
             }
 
-            client.AddHandler(new XmlDeserializer(), "application/xml", "text/xml", "*+xml");
+            foreach(var contentType in new string[] { "application/xml", "text/xml", "*+xml" } )
+                client.AddHandler(contentType, () => { return new XmlDeserializer(); });
 
             client.Timeout = configuration.Timeout;
 
