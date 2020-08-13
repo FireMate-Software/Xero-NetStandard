@@ -345,7 +345,10 @@ namespace Xero.NetStandard.OAuth2.Client
                 }
                 else
                 {
-                    request.AddBody(options.Data);
+                    if (request.RequestFormat == DataFormat.Xml)
+                        request.AddXmlBody(options.Data);
+                    else
+                        request.AddJsonBody(options.Data);
                 }            
             }
 
@@ -437,7 +440,7 @@ namespace Xero.NetStandard.OAuth2.Client
             }
 
             InterceptRequest(req);
-            var response = await client.ExecuteTaskAsync<T>(req);
+            var response = await client.ExecuteAsync<T>(req);
             InterceptResponse(req, response);
 
             var result = toApiResponse(response);
